@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 
 import com.abdelrahman.shoppingcart.dtos.requests.CategoryRequest;
 import com.abdelrahman.shoppingcart.dtos.responses.CategoryResponse;
+import com.abdelrahman.shoppingcart.exceptions.AlreadyExistsException;
 import com.abdelrahman.shoppingcart.exceptions.RecordNotFoundException;
 import com.abdelrahman.shoppingcart.mappers.CategoryMapper;
 import com.abdelrahman.shoppingcart.models.Category;
 import com.abdelrahman.shoppingcart.repositories.CategoryRepo;
 import com.abdelrahman.shoppingcart.services.CategoryService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
@@ -22,8 +24,15 @@ public class CategoryServiceImpl implements CategoryService {
 	
 
 	@Override
+	@Transactional
 	public CategoryResponse addCategory(CategoryRequest request) {
+		
+		if(categoryRepo.existsByName(request.getName()))
+			throw new AlreadyExistsException(request.getName()+" already exists!");
+		
 		Category category = mapper.toEntity(request);
+		category.setName(request.getName().toUpperCase());
+		
 		CategoryResponse response = mapper.toDto(categoryRepo.save(category));
 		return response;
 	}
@@ -52,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public CategoryResponse getCategoryByName(String name) {
-		Category category = categoryRepo.findByName(name).orElseThrow(()->new RecordNotFoundException("Not found category with name :"+name));
+		Category category = categoryRepo.findByNameIgnoreCase(name).orElseThrow(()->new RecordNotFoundException("Not found category with name :"+name));
 		return mapper.toDto(category);
 	}
 

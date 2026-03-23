@@ -27,5 +27,5 @@ public class ProductRequest {
 	@Min(1)
 	private int inventory;
 	private String description;
-	private Long categoryId;
+	private String categoryName;
 }

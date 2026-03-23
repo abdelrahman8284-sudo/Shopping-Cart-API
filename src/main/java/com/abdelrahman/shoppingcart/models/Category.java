@@ -29,4 +29,16 @@ public class Category {
 	@OneToMany(mappedBy = "category")
 	private List<Product> products= new ArrayList<>();
 
+	public Category(Long id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
+	public Category(String name) {
+		super();
+		this.name = name;
+	}
+
+	
 }

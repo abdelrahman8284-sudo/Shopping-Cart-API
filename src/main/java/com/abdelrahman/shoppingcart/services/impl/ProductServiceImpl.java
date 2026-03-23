@@ -1,6 +1,7 @@
 package com.abdelrahman.shoppingcart.services.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import com.abdelrahman.shoppingcart.repositories.CategoryRepo;
 import com.abdelrahman.shoppingcart.repositories.ProductRepo;
 import com.abdelrahman.shoppingcart.services.ProductService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
@@ -25,25 +27,55 @@ public class ProductServiceImpl implements ProductService {
 	
 
 	@Override
+	@Transactional
 	public ProductResponse addProduct(ProductRequest request) {
-		Category category = categoryRepo.findById(request.getCategoryId()).orElseThrow(()->new RecordNotFoundException("Not found category"));
+		
+		// check if category is found in database
+		// if yes then create product and set it
+		// if no then save it as a new category
+		// then set as a new product category
+		
+		//Category category = categoryRepo.findById(request.getCategoryId()).orElseThrow(()->new RecordNotFoundException("Not found category"));
+		Category category = categoryRepo.findByNameIgnoreCase(request.getCategoryName())
+		        .orElseGet(() -> {
+		            Category newCategory = new Category(request.getCategoryName());
+		            return categoryRepo.save(newCategory);
+		        });
+			
+		
 		Product product = mapper.toEntity(request);
 		product.setCategory(category);
 		ProductResponse response = mapper.toDto(productRepo.save(product));
 		return response;
 	}
+	
+//	private Product createProduct(ProductRequest request,Category category) {
+//		return new Product(
+//				request.getName(),
+//				request.getBrand(),
+//				request.getPrice(),
+//				request.getInventory(),
+//				request.getDescription(),
+//				category
+//				);
+//	}
 
 	@Override
-	public void updateProduct(Long id, ProductRequest request) {
+	@Transactional
+	public ProductResponse updateProduct(Long id, ProductRequest request) {
 		Product current = productRepo.findById(id).orElseThrow(()->new RecordNotFoundException("Not found product with id : "+id));
-		Category category = categoryRepo.findById(request.getCategoryId())
-		        .orElseThrow(() -> new RecordNotFoundException("Category not found"));
+		Category category = categoryRepo.findByNameIgnoreCase(request.getCategoryName())
+	            .orElseGet(() -> categoryRepo.save(Category.builder()
+	                    .name(request.getCategoryName())
+	                    .build()));
 		current.setCategory(category);
 		mapper.toEntity(request, current);
-		productRepo.save(current);
+		ProductResponse response = mapper.toDto(productRepo.save(current));
+		return response;
 	}
 
 	@Override
+	@Transactional
 	public void deleteProduct(Long id) {
 	    if (!productRepo.existsById(id)) {
 	        throw new RecordNotFoundException("Product Not found");

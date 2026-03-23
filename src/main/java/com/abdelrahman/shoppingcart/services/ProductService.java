@@ -8,7 +8,7 @@ import com.abdelrahman.shoppingcart.dtos.responses.ProductResponse;
 public interface ProductService {
 
 	ProductResponse addProduct(ProductRequest request);
-	void updateProduct(Long id,ProductRequest request);
+	ProductResponse updateProduct(Long id,ProductRequest request);
 	void deleteProduct(Long id);
 	ProductResponse getProductById(Long id);
 	List<ProductResponse> getProductsByName(String name);

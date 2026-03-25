@@ -3,6 +3,8 @@ package com.abdelrahman.shoppingcart.dtos.responses;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.abdelrahman.shoppingcart.dtos.requests.ImageDto;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,5 +27,5 @@ public class ProductResponse {
 	
 	private Long categoryId;
 	
-	private List<Long> imagesIds;
+	private List<ImageResponse> images;
 }

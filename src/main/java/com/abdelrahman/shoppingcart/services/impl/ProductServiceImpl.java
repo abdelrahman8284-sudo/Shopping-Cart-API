@@ -86,7 +86,8 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public ProductResponse getProductById(Long id) {
 		Product product = productRepo.findById(id)
-				.orElseThrow(()->new RecordNotFoundException("Product with id:" +id+" not found"));		
+				.orElseThrow(()->new RecordNotFoundException("Product with id:" +id+" not found"));	
+		
 		return mapper.toDto(product);
 	}
 

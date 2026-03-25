@@ -30,12 +30,13 @@ public class Image {
 	private String fileType;
 	
 	private String filePath;
-	
-	@Lob
-	@Column(name="image",columnDefinition = "BYTEA")
+
+	private String downloadUrl;
+
+	//@Lob
+	@Column(name="image")
 	private byte[] image;
 	
-	private String downloadUrl;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id")

@@ -90,6 +90,10 @@ public class ProductServiceImpl implements ProductService {
 		
 		return mapper.toDto(product);
 	}
+	@Override
+	public Product getProduct(Long id) {
+		return productRepo.findById(id).orElseThrow(()->new RecordNotFoundException("Product not found"));
+	}
 
 	@Override
 	public List<ProductResponse> getProductsByName(String name) {

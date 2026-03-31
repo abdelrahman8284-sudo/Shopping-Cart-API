@@ -2,7 +2,9 @@ package com.abdelrahman.shoppingcart.models;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -45,6 +47,9 @@ public class Product {
 	
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<Image> images = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "product")
+	private Set<CartItem> items = new HashSet<>();
 	
 	public Product(String name, String brand, BigDecimal price, int inventory, String description, Category category) {
 		super();

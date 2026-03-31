@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.abdelrahman.shoppingcart.dtos.requests.ProductRequest;
 import com.abdelrahman.shoppingcart.dtos.responses.ProductResponse;
+import com.abdelrahman.shoppingcart.models.Product;
 
 public interface ProductService {
 
@@ -11,6 +12,7 @@ public interface ProductService {
 	ProductResponse updateProduct(Long id,ProductRequest request);
 	void deleteProduct(Long id);
 	ProductResponse getProductById(Long id);
+	Product getProduct(Long id);
 	List<ProductResponse> getProductsByName(String name);
 	List<ProductResponse> getAllProducts();
 	List<ProductResponse> getProductsByCategory(String category);

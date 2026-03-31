@@ -1,0 +1,60 @@
+package com.abdelrahman.shoppingcart.controllers;
+
+import java.math.BigDecimal;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.abdelrahman.shoppingcart.dtos.responses.ApiResponse;
+import com.abdelrahman.shoppingcart.dtos.responses.CartResponse;
+import com.abdelrahman.shoppingcart.exceptions.RecordNotFoundException;
+import com.abdelrahman.shoppingcart.mappers.CartMapper;
+import com.abdelrahman.shoppingcart.models.Cart;
+import com.abdelrahman.shoppingcart.services.CartService;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/v1/carts")
+@RequiredArgsConstructor
+public class CartController {
+
+	private final CartService cartService;
+	private final CartMapper mapper;
+	
+	
+	 @GetMapping("/{cartId}/my-cart")
+	    public ResponseEntity<ApiResponse> getCart( @PathVariable Long cartId) {
+	        try {
+	            Cart cart = cartService.getCart(cartId);
+	            CartResponse response = mapper.toCartResponse(cart);
+	            return ResponseEntity.ok(new ApiResponse("Success", response));
+	        } catch (RecordNotFoundException e) {
+	          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+	        }
+	    }
+	 
+	@DeleteMapping("/{cartId}") 
+	public ResponseEntity<ApiResponse> clearCart(@PathVariable Long cartId) {
+	    
+	    Cart cart = cartService.clearCart(cartId);
+	    CartResponse response = mapper.toCartResponse(cart);
+	    return ResponseEntity.ok(new ApiResponse("The cart has been successfully cleared", response));
+	}
+	
+	@GetMapping("/{cartId}/total-price") 
+	public ResponseEntity<ApiResponse> getTotalAmount(@PathVariable Long cartId) {
+	    
+		 try {
+	            BigDecimal totalPrice = cartService.getTotalAmount(cartId);
+	            return ResponseEntity.ok(new ApiResponse("Total Price", totalPrice));
+	        } catch (RecordNotFoundException e) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+	        }
+	}
+}

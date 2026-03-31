@@ -30,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 public class CategoryController {
 
 	private final CategoryService categoryService;
-	
 	@PostMapping
 	public ResponseEntity<CategoryResponse> addCategory(@RequestBody@Valid CategoryRequest request) {		
 		return new ResponseEntity<>(categoryService.addCategory(request),HttpStatus.CREATED);

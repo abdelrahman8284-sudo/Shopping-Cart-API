@@ -1,9 +1,13 @@
 package com.abdelrahman.shoppingcart.controllers;
 
 import java.math.BigDecimal;
+import java.nio.file.AccessDeniedException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +19,7 @@ import com.abdelrahman.shoppingcart.dtos.responses.CartResponse;
 import com.abdelrahman.shoppingcart.exceptions.RecordNotFoundException;
 import com.abdelrahman.shoppingcart.mappers.CartMapper;
 import com.abdelrahman.shoppingcart.models.Cart;
+import com.abdelrahman.shoppingcart.security.dtos.UserPrinciple;
 import com.abdelrahman.shoppingcart.services.CartService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,17 +32,25 @@ public class CartController {
 	private final CartService cartService;
 	private final CartMapper mapper;
 	
-	
-	 @GetMapping("/{cartId}/my-cart")
-	    public ResponseEntity<ApiResponse> getCart( @PathVariable Long cartId) {
-	        try {
-	            Cart cart = cartService.getCart(cartId);
-	            CartResponse response = mapper.toCartResponse(cart);
-	            return ResponseEntity.ok(new ApiResponse("Success", response));
-	        } catch (RecordNotFoundException e) {
-	          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
-	        }
-	    }
+	private Long getCurrentUserId() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UserPrinciple user = (UserPrinciple) auth.getPrincipal();
+		return  user.getId();
+	}
+	@GetMapping("/{cartId}/my-cart")
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<ApiResponse> getCart( @PathVariable Long cartId) {
+        try {
+            Cart cart = cartService.getCart(cartId);
+            CartResponse response = mapper.toCartResponse(cart);
+            return ResponseEntity.ok(new ApiResponse("Success", response));
+        } catch (RecordNotFoundException e) {
+          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }
+        catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(e.getMessage(), null));
+          }
+    }
 	 
 	@DeleteMapping("/{cartId}") 
 	public ResponseEntity<ApiResponse> clearCart(@PathVariable Long cartId) {
@@ -55,6 +68,21 @@ public class CartController {
 	            return ResponseEntity.ok(new ApiResponse("Total Price", totalPrice));
 	        } catch (RecordNotFoundException e) {
 	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
-	        }
+	        }catch (AccessDeniedException e) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(e.getMessage(), null));
+	          }
 	}
+	
+	@GetMapping("/my-cart")
+	@PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<ApiResponse> getCartByUser() {
+        try {
+            Cart cart = cartService.getCartByUserId(getCurrentUserId());
+            CartResponse response = mapper.toCartResponse(cart);
+            return ResponseEntity.ok(new ApiResponse("Success", response));
+        } catch (RecordNotFoundException e) {
+          return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }
+
+    }
 }

@@ -1,12 +1,14 @@
 package com.abdelrahman.shoppingcart.repositories;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.abdelrahman.shoppingcart.models.Cart;
+import com.abdelrahman.shoppingcart.models.Order;
 
 @Repository
-public interface CartRepo extends JpaRepository<Cart, Long> {
+public interface OrderRepo  extends JpaRepository<Order, Long>{
 
-	Cart findByUserId(Long userId);
+	List<Order> findByUserId(Long userId);
 }

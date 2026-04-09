@@ -9,6 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,42 +48,7 @@ public class GlobalExceptionHandling extends ResponseEntityExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 	}
 	
-//	@ExceptionHandler(MethodArgumentNotValidException.class)
-//	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-//	HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//List<String> errors = new ArrayList<>();
-//
-//ex.getBindingResult().getFieldErrors().forEach(f ->errors.add(f.getDefaultMessage()));
-//ex.getBindingResult().getGlobalErrors().forEach(o ->errors.add(o.getDefaultMessage()));
-//
-//
-//ErrorResponseDto errorResponse = new ErrorResponseDto(
-//		"Validation Error",
-//		errors,
-//		HttpStatus.BAD_REQUEST.value()
-//		);
-//
-//return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-//}
 
-//	@Override
-//	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-//			HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//		List<String> errors = new ArrayList<>();
-//		
-//		ex.getBindingResult().getFieldErrors().forEach(f ->errors.add(f.getDefaultMessage()));
-//		ex.getBindingResult().getGlobalErrors().forEach(o ->errors.add(o.getDefaultMessage()));
-//		
-//		
-//		ErrorResponseDto errorResponse = new ErrorResponseDto(
-//				"Validation Error",
-//				errors,
-//				HttpStatus.BAD_REQUEST.value()
-//				);
-//		
-//		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-//	}
-//	
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 	        HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -147,22 +114,42 @@ public class GlobalExceptionHandling extends ResponseEntityExceptionHandler {
 	    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
 	}
 	
-//	@ExceptionHandler(BadCredentialsException.class)
-//	public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException ex ){
-//		ErrorResponseDto errorResponse = ErrorResponseDto.builder()
-//				.message("Invalid Username or password")
-//				.status(HttpStatus.UNAUTHORIZED.value())
-//				.details(Arrays.asList(ex.getMessage()))
-//				.build();
-//		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
-//	}
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException ex ){
+		ErrorResponseDto errorResponse = ErrorResponseDto.builder()
+				.message("Invalid Username or password")
+				.status(HttpStatus.UNAUTHORIZED.value())
+				.details(Arrays.asList(ex.getMessage()))
+				.build();
+		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+	}
 	
-//	@ExceptionHandler(AuthorizationDeniedException.class)
-//	public ResponseEntity<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex){
-//		ErrorResponseDto error = ErrorResponseDto.builder()
-//				.message("This user is not allowed")
-//				.status(HttpStatus.UNAUTHORIZED.value())
-//				.build();
-//		return new ResponseEntity<>(error,HttpStatus.UNAUTHORIZED);
-//	}
+	@ExceptionHandler(AuthorizationDeniedException.class)
+	public ResponseEntity<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex){
+		ErrorResponseDto error = ErrorResponseDto.builder()
+				.message("This user is not allowed")
+				.status(HttpStatus.UNAUTHORIZED.value())
+				.build();
+		return new ResponseEntity<>(error,HttpStatus.UNAUTHORIZED);
+	}
+	
+	@ExceptionHandler(IllegalOrderStateException.class)
+	public ResponseEntity<?> handleIllegalOrderStateException(IllegalOrderStateException ex){
+		ErrorResponseDto error = ErrorResponseDto.builder()
+				.message(ex.getLocalizedMessage())
+				.details(Arrays.asList(ex.getMessage()))
+				.status(HttpStatus.NOT_ACCEPTABLE.value())
+				.build();
+		return new ResponseEntity<>(error,HttpStatus.NOT_ACCEPTABLE);
+	}
+	
+	@ExceptionHandler(InsufficientStockException.class)
+	public ResponseEntity<?> handleInsufficientStockException(InsufficientStockException ex){
+		ErrorResponseDto error = ErrorResponseDto.builder()
+				.message(ex.getLocalizedMessage())
+				.details(Arrays.asList(ex.getMessage()))
+				.status(HttpStatus.CONFLICT.value())
+				.build();
+		return new ResponseEntity<>(error,HttpStatus.NOT_ACCEPTABLE);
+	}
 }

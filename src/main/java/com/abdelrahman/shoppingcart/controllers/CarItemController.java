@@ -1,7 +1,11 @@
 package com.abdelrahman.shoppingcart.controllers;
 
+import java.nio.file.AccessDeniedException;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -12,9 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.abdelrahman.shoppingcart.dtos.requests.AddItemToCart;
 import com.abdelrahman.shoppingcart.dtos.responses.ApiResponse;
+import com.abdelrahman.shoppingcart.dtos.responses.CartItemResponse;
 import com.abdelrahman.shoppingcart.dtos.responses.CartResponse;
+import com.abdelrahman.shoppingcart.mappers.CartItemMapper;
 import com.abdelrahman.shoppingcart.mappers.CartMapper;
 import com.abdelrahman.shoppingcart.models.Cart;
+import com.abdelrahman.shoppingcart.models.CartItem;
 import com.abdelrahman.shoppingcart.services.CartItemService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,12 +33,14 @@ public class CarItemController {
 	
 	
 	private final CartItemService itemService;
+	private final CartItemMapper itemMapper;
 	private final CartMapper mapper;
 
 	@PostMapping("/items/add") 
+	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<ApiResponse> addItemToCart(
 	        @RequestParam(required = false) Long cartId, 
-	        @RequestBody AddItemToCart itemRequest) {
+	        @RequestBody AddItemToCart itemRequest) throws AccessDeniedException {
 	    
 		Cart cart = itemService.addItemToCart(
 	            itemRequest.getProductId(), 
@@ -44,10 +53,11 @@ public class CarItemController {
 	}
 	
 	@PutMapping("/{cartId}/items/{itemId}/remove") 
+	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<ApiResponse> removeItemFromCart(
 			@PathVariable Long cartId,
 			@PathVariable Long itemId,
-			@RequestParam int removedCount) {
+			@RequestParam int removedCount) throws AccessDeniedException {
 	    
 	    Cart cart = itemService.removeItemFromCart(
 	    		cartId,
@@ -59,10 +69,11 @@ public class CarItemController {
 	}
 	
 	@PutMapping("/{cartId}/items/{itemId}/update") 
+	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<ApiResponse> updateItemQuantity(
 			@PathVariable Long cartId,
 			@PathVariable Long itemId,
-			@RequestParam int newQuantity) {
+			@RequestParam int newQuantity) throws AccessDeniedException {
 	    
 	    Cart cart = itemService.updateItemQuantity(
 	    		cartId,
@@ -71,6 +82,15 @@ public class CarItemController {
 	    
 	    CartResponse response = mapper.toCartResponse(cart);
 	    return ResponseEntity.ok(new ApiResponse("Item quantity updated successfully", response));
+	}
+	@PreAuthorize("hasAnyRole('USER','ADMIN')")
+	@GetMapping("/cart/{cartId}/product/{productId}")
+	public ResponseEntity<?> getCartItem(
+			@PathVariable Long cartId,
+			@PathVariable Long productId) throws AccessDeniedException{
+		CartItem item = itemService.getCartItem(cartId, productId);
+		CartItemResponse response = itemMapper.toCartItemResponse(item);
+		return ResponseEntity.ok(new ApiResponse("Item ", response));
 	}
 
 }

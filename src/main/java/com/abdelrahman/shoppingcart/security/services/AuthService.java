@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.abdelrahman.shoppingcart.dtos.responses.UserResponse;
 import com.abdelrahman.shoppingcart.enums.Role;
+import com.abdelrahman.shoppingcart.exceptions.AlreadyExistsException;
 import com.abdelrahman.shoppingcart.models.Cart;
 import com.abdelrahman.shoppingcart.models.User;
 import com.abdelrahman.shoppingcart.repositories.UserRepo;
@@ -32,6 +33,9 @@ public class AuthService {
 	private final CartService cartService;
 	@Transactional
 	public User register(User user) {
+		if(userRepo.existsByEmail(user.getEmail())) {
+			throw new AlreadyExistsException("Oops!"+user.getEmail()+" already exists!");
+		}
 		user.setPassword(encoder.encode(user.getPassword()));
 		if(user.getRole()==null || user.getRole()!=Role.ROLE_USER)
 			user.setRole(Role.ROLE_USER);

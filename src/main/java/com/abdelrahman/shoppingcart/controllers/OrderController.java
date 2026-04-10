@@ -44,7 +44,7 @@ public class OrderController {
         try {
             Order order = orderService.placeOrder(getCurrentUserId());
             OrderResponse response = mapper.toOrderResponse(order);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Success", response));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Item order Success!", response));
         }
         catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(e.getMessage(), null));

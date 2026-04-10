@@ -1,16 +1,21 @@
 package com.abdelrahman.shoppingcart.services.impl;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.abdelrahman.shoppingcart.dtos.UserUpdateRequest;
 import com.abdelrahman.shoppingcart.dtos.requests.UserRequestDto;
 import com.abdelrahman.shoppingcart.dtos.responses.UserResponse;
 import com.abdelrahman.shoppingcart.exceptions.RecordNotFoundException;
 import com.abdelrahman.shoppingcart.mappers.UserMapper;
 import com.abdelrahman.shoppingcart.models.User;
 import com.abdelrahman.shoppingcart.repositories.UserRepo;
+import com.abdelrahman.shoppingcart.security.dtos.UserPrinciple;
 import com.abdelrahman.shoppingcart.services.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,15 +30,18 @@ public class UserServiceImpl implements UserService {
 	private final PasswordEncoder encoder;
 	
 	
-	public UserResponse update(Long id,UserRequestDto dto) {
+	public UserResponse update(Long id,UserUpdateRequest dto) throws AccessDeniedException {
 		User currentUser = userRepo.findById(id).orElseThrow(()->new RecordNotFoundException("User Not found"));
-		User user = mapper.toUser(dto);
-		currentUser.setUsername(user.getUsername());
-		currentUser.setEmail(user.getEmail());
-		if(dto.getPassword() != null && !dto.getPassword().isBlank()) {
-		    currentUser.setPassword(encoder.encode(dto.getPassword()));
+
+		if(dto.getUsername()!=null && !dto.getUsername().isBlank()) {
+			currentUser.setUsername(dto.getUsername());
 		}
-		return mapper.toUserResponse(userRepo.save(currentUser));
+		if(dto.getEmail()!=null && !dto.getEmail().isBlank()) {
+			currentUser.setEmail(dto.getEmail());
+		}
+		User user = userRepo.save(currentUser);
+		
+		return mapper.toUserResponse(user);
 	}
 	
 	

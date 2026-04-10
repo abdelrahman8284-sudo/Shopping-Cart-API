@@ -115,7 +115,7 @@ public class CartItemServiceImpl implements CartItemService {
 	public Cart removeItemFromCart(Long cartId, Long itemId, int removedCount) throws AccessDeniedException {
 		Cart cart = cartRepo.findById(cartId).orElseThrow(()->new RecordNotFoundException("Cart not found"));
 		if(!isCurrentUser(cart.getUser().getId())) {
-			throw new AccessDeniedException("User not allowed to see this cart");
+			throw new AccessDeniedException("User not allowed to remove items from this cart");
 		}
 		CartItem currentItem = cart.getItems().stream()
 				.filter(item ->item.getId().equals(itemId))
@@ -147,7 +147,7 @@ public class CartItemServiceImpl implements CartItemService {
 	public CartItem getCartItem(Long cartId, Long productId) throws AccessDeniedException {
 		Cart cart = cartService.getCart(cartId);
 		if(!isCurrentUser(cart.getUser().getId())) {
-			throw new AccessDeniedException("User not allowed to see this cart");
+			throw new AccessDeniedException("User not allowed to see this item");
 		}
 		return cart.getItems().stream()
 				.filter(item->item.getProduct().getId().equals(productId))

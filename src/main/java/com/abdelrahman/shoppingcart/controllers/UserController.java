@@ -1,5 +1,8 @@
 package com.abdelrahman.shoppingcart.controllers;
 
+import java.nio.file.AccessDeniedException;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.abdelrahman.shoppingcart.dtos.UserUpdateRequest;
 import com.abdelrahman.shoppingcart.dtos.requests.UserRequestDto;
+import com.abdelrahman.shoppingcart.dtos.responses.ApiResponse;
 import com.abdelrahman.shoppingcart.services.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,8 +33,12 @@ public class UserController {
 	@PutMapping("/{id}")
 	@Operation(summary = "Update User")
 	@PreAuthorize("hasRole('ADMIN') or #id == principal.id")
-	public ResponseEntity<?> update(@PathVariable Long id, @RequestBody UserRequestDto dto) {
-		return ResponseEntity.ok(userService.update(id, dto));
+	public ResponseEntity<?> update(@PathVariable Long id, @RequestBody UserUpdateRequest dto) {
+		try {
+			return ResponseEntity.ok().body(new ApiResponse("Updated successfully",userService.update(id, dto)));
+		} catch (AccessDeniedException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(e.getMessage(),null));
+		}
 	}
 
 

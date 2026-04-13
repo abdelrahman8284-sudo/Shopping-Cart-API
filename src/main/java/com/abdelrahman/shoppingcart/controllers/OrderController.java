@@ -68,9 +68,21 @@ public class OrderController {
 	
 	@GetMapping("/my") 
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
-	public ResponseEntity<ApiResponse> getUserOrders(@PathVariable Long userId){
+	public ResponseEntity<ApiResponse> getUserOrders(){
 		try {
-			List<Order> orders = orderService.getUserOrders(userId);
+			List<Order> orders = orderService.getUserOrders(getCurrentUserId());
+			List<OrderResponse> response = mapper.toListOrderResponse(orders);
+			return ResponseEntity.ok(new ApiResponse("Orders found successfully", response));
+		}catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(e.getMessage(), null));
+        }
+	}
+	
+	@GetMapping("/users/{userId}") 
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<ApiResponse> getUserOrdersByAdmin(@PathVariable Long userId){
+		try {
+			List<Order> orders = orderService.getUserOrders(getCurrentUserId());
 			List<OrderResponse> response = mapper.toListOrderResponse(orders);
 			return ResponseEntity.ok(new ApiResponse("Orders found successfully", response));
 		}catch (AccessDeniedException e) {

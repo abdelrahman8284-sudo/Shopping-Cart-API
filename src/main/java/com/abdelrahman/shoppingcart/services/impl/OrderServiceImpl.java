@@ -1,5 +1,6 @@
 package com.abdelrahman.shoppingcart.services.impl;
 
+import java.math.BigDecimal;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +41,10 @@ public class OrderServiceImpl implements OrderService {
 			throw new AccessDeniedException("You cannot place an order for another user!");
 		}
 		Cart cart = cartService.getCartByUserId(userId);
+		
+		if (cart.getItems() == null || cart.getItems().isEmpty()) {
+	        throw new IllegalOrderStateException("Your cart is empty. You cannot place an empty order!");
+	    }
 		Order order = createOrder(cart);
 		cartService.clearCart(cart.getId());
 		processOrder(order.getId());
@@ -59,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
 			orderItem.setQuantity(cartItem.getQuantity());		
 			order.addOrderItem(orderItem);
 		}
+		
 		order.calculateTotalAmount();
 		return orderRepo.save(order);
 	}

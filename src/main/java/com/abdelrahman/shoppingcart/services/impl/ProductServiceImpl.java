@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.abdelrahman.shoppingcart.dtos.requests.ProductRequest;
 import com.abdelrahman.shoppingcart.dtos.responses.ProductResponse;
+import com.abdelrahman.shoppingcart.exceptions.AlreadyExistsException;
 import com.abdelrahman.shoppingcart.exceptions.RecordNotFoundException;
 import com.abdelrahman.shoppingcart.mappers.ProductMapper;
 import com.abdelrahman.shoppingcart.models.Category;
@@ -36,6 +37,9 @@ public class ProductServiceImpl implements ProductService {
 		// then set as a new product category
 		
 		//Category category = categoryRepo.findById(request.getCategoryId()).orElseThrow(()->new RecordNotFoundException("Not found category"));
+		if(productRepo.existsByNameAndBrand(request.getName(), request.getBrand())) {
+			throw new AlreadyExistsException(request.getBrand()+" "+request.getBrand()+" already exists");
+		}
 		Category category = categoryRepo.findByNameIgnoreCase(request.getCategoryName())
 		        .orElseGet(() -> {
 		            Category newCategory = new Category(request.getCategoryName());

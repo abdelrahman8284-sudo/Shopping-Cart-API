@@ -1,6 +1,7 @@
 package com.abdelrahman.shoppingcart.dtos.responses;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.abdelrahman.shoppingcart.enums.Role;
 
@@ -23,5 +24,7 @@ public class UserResponse {
 	
 	private LocalDateTime createdAt;
 	
-	private CartResponse cart;
+	private Long cartId;
+	
+	//private List<OrderResponse> orders;
 }

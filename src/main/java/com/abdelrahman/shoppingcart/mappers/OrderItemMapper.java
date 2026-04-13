@@ -14,6 +14,8 @@ import com.abdelrahman.shoppingcart.models.OrderItem;
 public interface OrderItemMapper {
 
 	@Mapping(source="product.name",target="productName")
+	@Mapping(source="product.id",target="productId")
+	@Mapping(source="product.brand",target="productBrand")
 	OrderItemResponse toOrderItemResponse(OrderItem item);
 	
 	List<OrderItemResponse> toListOrderItemResponse(List<OrderItem> items);

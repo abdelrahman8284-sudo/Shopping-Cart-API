@@ -22,10 +22,10 @@ public class JwtService {
 	@Value("${security.jwt.secret-key}")
 	private  String securityKey;
 	
-	public String generateToken(String email,String role) {
+	public String generateToken(String email,String role,Long userId) {
 		Map<String,Object> claims = new HashMap<>();
 		claims.put("role", role.toUpperCase());
-		
+		claims.put("userId",userId);
 		return Jwts.builder()
 				.claims()
 				.add(claims)
@@ -39,7 +39,7 @@ public class JwtService {
 
 	private SecretKey getKey() {
 		
-		byte[] keyBytes = securityKey.getBytes(StandardCharsets.UTF_8);
+		byte[] keyBytes = Decoders.BASE64.decode(securityKey);
 		return Keys.hmacShaKeyFor(keyBytes );
 	}
 	public boolean isTokenValid(String token, UserDetails userDetails) {

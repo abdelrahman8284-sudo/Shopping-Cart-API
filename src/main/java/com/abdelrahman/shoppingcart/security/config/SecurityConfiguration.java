@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.abdelrahman.shoppingcart.security.jwt.JwtAuthEntryPoint;
 import com.abdelrahman.shoppingcart.security.jwt.JwtFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,11 @@ public class SecurityConfiguration {
 
 	private final UserDetailsService userDetailsService;
 	private final JwtFilter jwtFilter;
+	private final JwtAuthEntryPoint authEntryPoint;
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http.csrf(csrf->csrf.disable())
+				.exceptionHandling(exception->exception.authenticationEntryPoint(authEntryPoint))
 				.authorizeHttpRequests(request ->request
 						.requestMatchers("/api/v1/auth/register"
 								,"/api/v1/auth/login"

@@ -17,6 +17,10 @@ public class OrderResponse {
 	private LocalDateTime orderDate;
 	private BigDecimal totalAmount;
 	private OrderStatus orderStatus;
-	private UserResponse user;	
+	
+	private String username;
+	private Long userId;
+	private String email;
+	
 	private Set<OrderItemResponse> orderItems;
 }

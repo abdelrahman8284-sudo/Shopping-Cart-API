@@ -57,7 +57,7 @@ public class AuthService {
 		if(authentication.isAuthenticated()) {
 			var user = (UserPrinciple)authentication.getPrincipal();
 			String authority = user.getAuthorities().iterator().next().getAuthority();
-			String token = jwtService.generateToken(user.getUsername(),authority);
+			String token = jwtService.generateToken(user.getUsername(),authority,user.getId());
 			
 			UserResponse response = UserResponse.builder()
 					.id(user.getId())

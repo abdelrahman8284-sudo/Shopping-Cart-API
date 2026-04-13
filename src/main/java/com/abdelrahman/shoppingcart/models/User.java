@@ -58,4 +58,6 @@ public class User {
 	
 	@OneToOne(mappedBy = "user",orphanRemoval = true,cascade = CascadeType.ALL)
 	private Cart cart;
+	@OneToMany(mappedBy="user", orphanRemoval = true,cascade = CascadeType.ALL)
+	private List<Order> orders = new ArrayList<>();
 }

@@ -18,6 +18,8 @@ public class MyUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		User user = userRepo.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("User with email :"+email +" not found !"));
+//		System.out.println("FOUND USER: " + user.getEmail());
+//		System.out.println("DB PASSWORD: " + user.getPassword());
 		return new UserPrinciple(user);
 	}
 

@@ -46,6 +46,8 @@ public class AuthService {
 	
 	
 	public AuthResponse login(UserLogin userLogin) {
+//		System.out.println("LOGIN EMAIL: " + userLogin.getEmail());
+//		System.out.println("LOGIN PASS: " + userLogin.getPassword());
 		return  verify(userLogin);
 	}
 
@@ -54,6 +56,15 @@ public class AuthService {
 		Authentication authentication = manager.authenticate(
 				new UsernamePasswordAuthenticationToken(
 						userLogin.getEmail(),userLogin.getPassword()));
+//		Authentication auth = manager.authenticate(
+//			    new UsernamePasswordAuthenticationToken(
+//			        userLogin.getEmail(),
+//			        userLogin.getPassword()
+//			    )
+//			);
+
+//			System.out.println("AUTH SUCCESS: " + authentication.isAuthenticated());
+//			System.out.println("PRINCIPAL: " + authentication.getPrincipal());
 		if(authentication.isAuthenticated()) {
 			var user = (UserPrinciple)authentication.getPrincipal();
 			String authority = user.getAuthorities().iterator().next().getAuthority();

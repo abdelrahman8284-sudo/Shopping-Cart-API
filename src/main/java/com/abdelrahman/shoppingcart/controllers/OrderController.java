@@ -22,11 +22,14 @@ import com.abdelrahman.shoppingcart.models.Order;
 import com.abdelrahman.shoppingcart.security.dtos.UserPrinciple;
 import com.abdelrahman.shoppingcart.services.OrderService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
+@Tag(name = "Order Management")
 public class OrderController {
 
 	private final OrderService orderService;
@@ -40,6 +43,7 @@ public class OrderController {
 	
 	@PostMapping
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@Operation(summary = "Create Order")
     public ResponseEntity<ApiResponse> createOrder() {
         try {
             Order order = orderService.placeOrder(getCurrentUserId());
@@ -56,6 +60,7 @@ public class OrderController {
 	
 	@GetMapping("/{orderId}") 
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@Operation(summary = "Get Order")
 	public ResponseEntity<ApiResponse> getOrder(@PathVariable Long orderId){
 		try {
 			Order order = orderService.getOrderById(orderId);
@@ -68,6 +73,7 @@ public class OrderController {
 	
 	@GetMapping("/my") 
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@Operation(summary = "Get my orders")
 	public ResponseEntity<ApiResponse> getUserOrders(){
 		try {
 			List<Order> orders = orderService.getUserOrders(getCurrentUserId());
@@ -80,9 +86,10 @@ public class OrderController {
 	
 	@GetMapping("/users/{userId}") 
 	@PreAuthorize("hasRole('ADMIN')")
+	@Operation(summary = "Get user Orders (Admin)")
 	public ResponseEntity<ApiResponse> getUserOrdersByAdmin(@PathVariable Long userId){
 		try {
-			List<Order> orders = orderService.getUserOrders(getCurrentUserId());
+			List<Order> orders = orderService.getUserOrders(userId);
 			List<OrderResponse> response = mapper.toListOrderResponse(orders);
 			return ResponseEntity.ok(new ApiResponse("Orders found successfully", response));
 		}catch (AccessDeniedException e) {
@@ -91,18 +98,21 @@ public class OrderController {
 	}
 	@PatchMapping("/{orderId}/ship")
 	@PreAuthorize("hasRole('ADMIN')")
+	@Operation(summary = "Ship Order (Admin)")
 	public ResponseEntity<ApiResponse> shipOrder(@PathVariable Long orderId){
 		orderService.shipOrder(orderId);
 		return ResponseEntity.ok(new ApiResponse("Shipping order successfully", null));
 	}
 	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/{orderId}/deliver") 
+	@Operation(summary = "Deliver Order (Admin)")
 	public ResponseEntity<ApiResponse> deliverOrder(@PathVariable Long orderId){
 		orderService.deliverOrder(orderId);
 		return ResponseEntity.ok(new ApiResponse("Order deliveres successfully", null));
 	}
 	@PatchMapping("/{orderId}/cancel") 
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@Operation(summary = "Cancel Order")
 	public ResponseEntity<ApiResponse> cancelOrder(@PathVariable Long orderId){
 		try {
 			orderService.cancelOrder(orderId);

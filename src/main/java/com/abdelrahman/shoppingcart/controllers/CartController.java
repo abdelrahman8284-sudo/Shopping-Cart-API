@@ -22,11 +22,14 @@ import com.abdelrahman.shoppingcart.models.Cart;
 import com.abdelrahman.shoppingcart.security.dtos.UserPrinciple;
 import com.abdelrahman.shoppingcart.services.CartService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/carts")
 @RequiredArgsConstructor
+@Tag(name = "Cart Management")
 public class CartController {
 
 	private final CartService cartService;
@@ -37,8 +40,9 @@ public class CartController {
 		UserPrinciple user = (UserPrinciple) auth.getPrincipal();
 		return  user.getId();
 	}
-	@GetMapping("/{cartId}/my-cart")
-	@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@GetMapping("/{cartId}")
+	@PreAuthorize("hasRole('ADMIN')")
+	@Operation(summary = "Get Cart by Id (Only Admin)")
     public ResponseEntity<ApiResponse> getCart( @PathVariable Long cartId) {
         try {
             Cart cart = cartService.getCart(cartId);
@@ -53,14 +57,19 @@ public class CartController {
     }
 	 
 	@DeleteMapping("/{cartId}") 
+	@Operation(summary = "Clear Cart by Id")
 	public ResponseEntity<ApiResponse> clearCart(@PathVariable Long cartId) {
-	    
-	    Cart cart = cartService.clearCart(cartId);
-	    CartResponse response = mapper.toCartResponse(cart);
-	    return ResponseEntity.ok(new ApiResponse("The cart has been successfully cleared", response));
-	}
+	    try {
+		    Cart cart = cartService.clearCart(cartId);
+		    CartResponse response = mapper.toCartResponse(cart);
+		    return ResponseEntity.ok(new ApiResponse("The cart has been successfully cleared", response));
 	
-	@GetMapping("/{cartId}/total-price") 
+	    }catch(AccessDeniedException e) {
+	    	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(e.getMessage(), null));
+	    }
+	}
+	@GetMapping("/{cartId}/total-price")
+	@Operation(summary = "Get total amount of Cart by cartId")
 	public ResponseEntity<ApiResponse> getTotalAmount(@PathVariable Long cartId) {
 	    
 		 try {
@@ -75,7 +84,8 @@ public class CartController {
 	
 	@GetMapping("/my-cart")
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<ApiResponse> getCartByUser() {
+	@Operation(summary = "Get Cart (my cart)")
+    public ResponseEntity<ApiResponse> getCurrentCart() {
         try {
             Cart cart = cartService.getCartByUserId(getCurrentUserId());
             CartResponse response = mapper.toCartResponse(cart);

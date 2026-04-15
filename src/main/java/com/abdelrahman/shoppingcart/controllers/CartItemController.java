@@ -24,13 +24,15 @@ import com.abdelrahman.shoppingcart.models.Cart;
 import com.abdelrahman.shoppingcart.models.CartItem;
 import com.abdelrahman.shoppingcart.services.CartItemService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/cart-items")
-public class CarItemController {
-
-	
+@Tag(name = "CartItem Management")
+public class CartItemController {	
 	
 	private final CartItemService itemService;
 	private final CartItemMapper itemMapper;
@@ -38,9 +40,10 @@ public class CarItemController {
 
 	@PostMapping("/items/add") 
 	@PreAuthorize("hasRole('USER')")
+	@Operation(summary = "Add Item to cart")
 	public ResponseEntity<ApiResponse> addItemToCart(
 	        @RequestParam(required = false) Long cartId, 
-	        @RequestBody AddItemToCart itemRequest) throws AccessDeniedException {
+	        @RequestBody@Valid AddItemToCart itemRequest) throws AccessDeniedException {
 	    
 		Cart cart = itemService.addItemToCart(
 	            itemRequest.getProductId(), 
@@ -54,6 +57,7 @@ public class CarItemController {
 	
 	@PutMapping("/{cartId}/items/{itemId}/remove") 
 	@PreAuthorize("hasRole('USER')")
+	@Operation(summary = "Remove item from cart")
 	public ResponseEntity<ApiResponse> removeItemFromCart(
 			@PathVariable Long cartId,
 			@PathVariable Long itemId,
@@ -70,6 +74,7 @@ public class CarItemController {
 	
 	@PutMapping("/{cartId}/items/{itemId}/update") 
 	@PreAuthorize("hasRole('USER')")
+	@Operation(summary = "Update item quantity")
 	public ResponseEntity<ApiResponse> updateItemQuantity(
 			@PathVariable Long cartId,
 			@PathVariable Long itemId,
@@ -85,6 +90,7 @@ public class CarItemController {
 	}
 	@PreAuthorize("hasAnyRole('USER','ADMIN')")
 	@GetMapping("/cart/{cartId}/product/{productId}")
+	@Operation(summary = "Get Cart item")
 	public ResponseEntity<?> getCartItem(
 			@PathVariable Long cartId,
 			@PathVariable Long productId) throws AccessDeniedException{

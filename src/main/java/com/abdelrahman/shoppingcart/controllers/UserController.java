@@ -20,12 +20,13 @@ import com.abdelrahman.shoppingcart.dtos.responses.ApiResponse;
 import com.abdelrahman.shoppingcart.services.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-//@Tag(name = "User Management", description = "User registration, authentication and profile management")
+@Tag(name = "User Management", description = "User registration, authentication and profile management")
 public class UserController {
 
 	private final UserService userService;

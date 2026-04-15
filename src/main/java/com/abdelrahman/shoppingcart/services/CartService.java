@@ -12,7 +12,7 @@ public interface CartService {
 	Cart getOrCreateCart(Long id);
 //	Cart addItemToCart(Long productId,Long cartId,int quantity);
 //	Cart removeItemFromCart(Long cartId,Long itemId,int removedCount);
-	Cart clearCart(Long cartId);
+	Cart clearCart(Long cartId) throws AccessDeniedException;
 	BigDecimal getTotalAmount(Long cartId) throws AccessDeniedException;
 	Cart getCart(Long cartId) throws AccessDeniedException;
 	Cart getCartByUserId(Long userId);

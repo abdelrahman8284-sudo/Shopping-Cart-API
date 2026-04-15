@@ -25,8 +25,10 @@ import com.abdelrahman.shoppingcart.dtos.responses.ApiResponse;
 import com.abdelrahman.shoppingcart.dtos.responses.ImageResponse;
 import com.abdelrahman.shoppingcart.services.ImageService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
+@Tag(name = "Image Management")
 @RestController
 @RequestMapping("/api/v1/images")
 @RequiredArgsConstructor
@@ -36,6 +38,7 @@ public class ImageController {
 	private final ImageService imageService;
 	
 	@PostMapping("/upload")
+	@Operation(summary = "Upload Image (Admin)")
 	public ResponseEntity<?> uploadImage(
 			@RequestParam MultipartFile file ,
 			@RequestParam Long productId) throws IOException,IllegalArgumentException{
@@ -49,6 +52,7 @@ public class ImageController {
 	}
 	
 	@PostMapping("/upload-multi")
+	@Operation(summary = "Upload Images (Admin)")
 	public ResponseEntity<?> uploadImages(
 			@RequestParam List<MultipartFile> files ,
 			@RequestParam Long productId) throws IOException,IllegalArgumentException{
@@ -60,6 +64,7 @@ public class ImageController {
 		}
 	}
 	@GetMapping("/{imageId}")
+	@Operation(summary = "Download Image (Admin)")
 	public ResponseEntity<?> downloadImage(@PathVariable Long imageId) throws IOException,IllegalArgumentException{
 		ImageDto imageDto = imageService.getImageMetaData(imageId);
 		Resource resource = imageService.getImageResource(imageId);
@@ -83,11 +88,14 @@ public class ImageController {
 	}
 	
 	@DeleteMapping("/{imageId}")
+	@Operation(summary = "Delete Image (Admin)")
 	public ResponseEntity<?> deleteImage(@PathVariable Long imageId) throws IOException{
 		imageService.deleteImage(imageId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
+	
 	@GetMapping("/product/{productId}")
+	@Operation(summary = "Get Image by Product id (Admin)")
 	public ResponseEntity<?> getByProductId(@PathVariable Long productId){
 		return ResponseEntity.ok(imageService.getImageByProductId(productId));
 	}

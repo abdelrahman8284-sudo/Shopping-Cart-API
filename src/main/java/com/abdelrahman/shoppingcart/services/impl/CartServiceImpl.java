@@ -46,7 +46,7 @@ public class CartServiceImpl implements CartService {
 	
 	@Override
 	public Cart getCart(Long cartId) throws AccessDeniedException{
-		Cart cart = cartRepo.findById(cartId).orElseThrow(()->new RecordNotFoundException("Cart not found"));
+		Cart cart = cartRepo.findById(cartId).orElseGet(()->getCartByUserId(getCurrentUser().getId()));
 		if(!isCurrentUser(cart.getUser().getId())) {
 			throw new AccessDeniedException("User not allowed to see this cart");
 		}
@@ -57,13 +57,14 @@ public class CartServiceImpl implements CartService {
 	
 	@Override
 	@Transactional
-	public Cart clearCart(Long cartId) {
+	public Cart clearCart(Long cartId) throws AccessDeniedException {
 	    Cart cart = cartRepo.findById(cartId)
 	            .orElseThrow(() -> new RecordNotFoundException("Cart Not found!"));
 	    
-	    if (cart.getItems() != null && !cart.getItems().isEmpty()) {
-
-	        
+	    if(!isCurrentUser(cart.getUser().getId())){
+	    	throw new AccessDeniedException("Current user not allowed to clear this cart");
+	    }
+	    if (cart.getItems() != null && !cart.getItems().isEmpty()) {    
 	        cart.getItems().clear();
 	    }
 	    

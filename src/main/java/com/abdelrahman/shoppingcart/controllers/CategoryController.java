@@ -20,10 +20,13 @@ import com.abdelrahman.shoppingcart.dtos.requests.CategoryRequest;
 import com.abdelrahman.shoppingcart.dtos.responses.CategoryResponse;
 import com.abdelrahman.shoppingcart.services.CategoryService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Category Management")
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
@@ -33,41 +36,46 @@ public class CategoryController {
 
 	private final CategoryService categoryService;
 	@PostMapping
+	@Operation(summary = "Create Category (Admin only)")
 	public ResponseEntity<CategoryResponse> addCategory(@RequestBody@Valid CategoryRequest request) {		
 		return new ResponseEntity<>(categoryService.addCategory(request),HttpStatus.CREATED);
 	}
 
 	@PutMapping("/{id}")
+	@Operation(summary = "Update Category (Admin only)")
 	public ResponseEntity<Void> updateCategory(@PathVariable Long id,@RequestBody@Valid CategoryRequest request) {
 		categoryService.updateCategory(id,request);
 		return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
 	}
 
 	@DeleteMapping("/{id}")
+	@Operation(summary = "Delete Category by Id (Admin only)")
 	public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
 		categoryService.deleteCategory(id);
 	    return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 	}
 
 	@GetMapping("/{id}")
+	@Operation(summary = "Get Category by Id (Admin only)")
 	public ResponseEntity<CategoryResponse>  getCategoryById(@PathVariable Long id) {
 		return ResponseEntity.ok(categoryService.getCategoryById(id));
 	}
 
 	@GetMapping("/search-name")
+	@Operation(summary = "Get Category by Name (Admin only)")
 	public ResponseEntity<CategoryResponse> getCategoryByName(@RequestParam@NotBlank(message = "The name can't be empty.") String name) {
 		return ResponseEntity.ok(categoryService.getCategoryByName(name));
 	}
 
 	@GetMapping
+	@Operation(summary = "Get All categories (Admin only)")
 	public ResponseEntity<List<CategoryResponse>> getAllCategories() {
 		return ResponseEntity.ok(categoryService.getAllCategories());
 	}
 
-
+	@Operation(summary = "Get count of categories (Admin only)")
 	@GetMapping("/count")
 	public ResponseEntity<Long> countCategories() {
-
 	    return ResponseEntity.ok(categoryService.countCategories());
 	}
 }

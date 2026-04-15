@@ -581,4 +581,13 @@ Examples:
 ---
 # 🗺 Database Schema (ERD)
 
-![ERD](screenshots/Blogplatform_Schema.png)
+![ERD](screenshots/shopping-cart-diagrm.png)
+
+### 🔗 Relationships
+
+- User → Cart (One-to-One)
+- User → Orders (One-to-Many)
+- Cart → CartItems (One-to-Many)
+- Order → OrderItems (One-to-Many)
+- Product → Category (Many-to-One)
+- Product → Images (One-to-Many)
